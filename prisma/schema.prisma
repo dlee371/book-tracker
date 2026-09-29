@@ -100,6 +100,9 @@ model Book {
   userId          String
   title           String
   author          String
+  // Derived from `author` on every save ("Clear, James"); used for sorting.
+  // See lib/author-sort.ts.
+  authorSort      String
   coverUrl        String?
   description     String?
   genre           String?

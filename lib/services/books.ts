@@ -1,5 +1,6 @@
 import "server-only";
 
+import { authorSortKey } from "@/lib/author-sort";
 import { db } from "@/lib/db";
 import type { Prisma, ReadingStatus } from "@/lib/generated/prisma/client";
 import type { LibraryQuery, LibrarySort } from "@/lib/library-query";
@@ -13,7 +14,7 @@ import type { BookInput } from "@/lib/validation/book";
 const ORDER_BY: Record<LibrarySort, Prisma.BookOrderByWithRelationInput[]> = {
   added: [{ createdAt: "desc" }, { title: "asc" }],
   title: [{ title: "asc" }, { author: "asc" }],
-  author: [{ author: "asc" }, { title: "asc" }],
+  author: [{ authorSort: "asc" }, { title: "asc" }],
   rating: [{ rating: { sort: "desc", nulls: "last" } }, { title: "asc" }],
   finished: [
     { finishedAt: { sort: "desc", nulls: "last" } },
@@ -72,7 +73,9 @@ export function getBook(userId: string, bookId: string) {
 }
 
 export function createBook(userId: string, input: BookInput) {
-  return db.book.create({ data: { ...input, userId } });
+  return db.book.create({
+    data: { ...input, authorSort: authorSortKey(input.author), userId },
+  });
 }
 
 // updateMany/deleteMany let us filter by userId as well as id. They return how
@@ -84,7 +87,7 @@ export async function updateBook(
 ): Promise<boolean> {
   const { count } = await db.book.updateMany({
     where: { id: bookId, userId },
-    data: input,
+    data: { ...input, authorSort: authorSortKey(input.author) },
   });
   return count > 0;
 }
