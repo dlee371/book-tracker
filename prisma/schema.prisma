@@ -1,0 +1,13 @@
+// Database schema. After editing, run `npm run db:migrate` to create a
+// migration and regenerate the Prisma Client.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Models are added in Milestone 1 (Book) onwards.

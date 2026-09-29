@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dev",
+      "runtimeExecutable": "/Users/davidlee/.local/share/fnm/fnm",
+      "runtimeArgs": ["exec", "--using=24", "npm", "run", "dev"],
+      "port": 3000
+    }
+  ]
+}
