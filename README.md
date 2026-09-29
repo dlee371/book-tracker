@@ -64,6 +64,7 @@ app/tags/             Tag index and per-tag pages (ideas and notes)
 app/search/           Global search page
 components/auth/      Login and sign-up forms
 components/books/     Book form, cover, rating stars, library toolbar
+components/dashboard/ Stat tiles, books-finished chart, compact book lists
 components/ideas/     Idea form and idea card
 components/notes/     Note form and note card
 components/tags/      Tag links

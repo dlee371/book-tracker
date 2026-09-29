@@ -32,9 +32,10 @@ export type IdeaWithDetails = Prisma.IdeaGetPayload<{
 // whose title contains `q` (case-insensitive).
 export function listIdeas(
   userId: string,
-  options: { tag?: string; q?: string } = {},
+  options: { tag?: string; q?: string; take?: number } = {},
 ) {
   return db.idea.findMany({
+    take: options.take,
     where: {
       userId,
       ...(options.tag && { tags: { some: { tag: { name: options.tag } } } }),
