@@ -22,6 +22,12 @@ export async function SiteHeader() {
               Library
             </Link>
             <Link
+              href="/ideas"
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              Ideas
+            </Link>
+            <Link
               href="/tags"
               className="text-sm text-muted-foreground hover:text-foreground"
             >

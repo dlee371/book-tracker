@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LightbulbIcon } from "lucide-react";
 
 import { deleteNoteAction } from "@/app/books/[id]/notes/actions";
 import { ConfirmButton } from "@/components/confirm-button";
@@ -43,7 +44,35 @@ export function NoteCard({
 
       <TagList names={note.tags.map(({ tag }) => tag.name)} />
 
-      <div className="flex gap-2">
+      {note.ideas.length > 0 && (
+        <ul className="grid gap-1 text-sm">
+          {note.ideas.map(({ idea }) => (
+            <li key={idea.id}>
+              <Link
+                href={`/ideas/${idea.id}`}
+                className="flex items-start gap-1.5 underline-offset-4 hover:underline"
+              >
+                <LightbulbIcon className="mt-0.5 size-3.5 shrink-0 text-amber-500" />
+                {idea.title}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <div className="flex flex-wrap gap-2">
+        <Link
+          href={`/ideas/new?fromNote=${note.id}`}
+          className={buttonVariants({ variant: "outline", size: "xs" })}
+        >
+          Turn into idea
+        </Link>
+        <Link
+          href={`/books/${note.bookId}/notes/${note.id}/add-to-idea`}
+          className={buttonVariants({ variant: "ghost", size: "xs" })}
+        >
+          Add to idea
+        </Link>
         <Link
           href={`/books/${note.bookId}/notes/${note.id}/edit`}
           className={buttonVariants({ variant: "ghost", size: "xs" })}

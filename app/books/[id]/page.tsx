@@ -6,6 +6,7 @@ import { ArrowLeftIcon, PencilIcon } from "lucide-react";
 import { createNoteAction } from "@/app/books/[id]/notes/actions";
 import { BookCover } from "@/components/books/book-cover";
 import { RatingStars } from "@/components/books/rating-stars";
+import { IdeaCard } from "@/components/ideas/idea-card";
 import { NoteCard } from "@/components/notes/note-card";
 import { NoteForm } from "@/components/notes/note-form";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +16,7 @@ import { getCurrentUserId } from "@/lib/current-user";
 import { formatCalendarDate } from "@/lib/dates";
 import type { Book } from "@/lib/generated/prisma/client";
 import { getBook } from "@/lib/services/books";
+import { listIdeasForBook } from "@/lib/services/ideas";
 import { listNotesForBook } from "@/lib/services/notes";
 
 export async function generateMetadata({
@@ -29,9 +31,10 @@ export default async function BookPage({ params }: PageProps<"/books/[id]">) {
   const { id } = await params;
   const userId = await getCurrentUserId();
 
-  const [book, notes] = await Promise.all([
+  const [book, notes, ideas] = await Promise.all([
     getBook(userId, id),
     listNotesForBook(userId, id),
+    listIdeasForBook(userId, id),
   ]);
   if (!book) notFound();
 
@@ -56,6 +59,18 @@ export default async function BookPage({ params }: PageProps<"/books/[id]">) {
         <section className="grid gap-2">
           <h2 className="font-semibold">Your review</h2>
           <p className="whitespace-pre-line">{book.review}</p>
+        </section>
+      )}
+
+      {ideas.length > 0 && (
+        <section className="grid gap-3">
+          <h2 className="font-semibold">
+            Ideas from this book{" "}
+            <span className="font-normal text-muted-foreground">{ideas.length}</span>
+          </h2>
+          {ideas.map((idea) => (
+            <IdeaCard key={idea.id} idea={idea} />
+          ))}
         </section>
       )}
 

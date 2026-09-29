@@ -11,6 +11,7 @@ import type { NoteInput } from "@/lib/validation/note";
 const noteInclude = {
   tags: { include: { tag: true }, orderBy: { tag: { name: "asc" } } },
   book: { select: { id: true, title: true } },
+  ideas: { include: { idea: { select: { id: true, title: true } } } },
 } satisfies Prisma.NoteInclude;
 
 export type NoteWithDetails = Prisma.NoteGetPayload<{

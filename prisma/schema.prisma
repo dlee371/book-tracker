@@ -29,6 +29,7 @@ model User {
   books    Book[]
   notes    Note[]
   tags     Tag[]
+  ideas    Idea[]
 
   @@map("users")
 }
@@ -119,8 +120,9 @@ model Book {
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
-  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  notes Note[]
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notes       Note[]
+  ideaSources IdeaSource[]
 
   @@index([userId])
   @@map("books")
@@ -138,8 +140,9 @@ model Note {
   updatedAt DateTime @updatedAt
 
   user User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  book Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  tags NoteTag[]
+  book  Book       @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  tags  NoteTag[]
+  ideas IdeaNote[]
 
   @@index([bookId])
   @@index([userId])
@@ -160,6 +163,7 @@ model Tag {
 
   user  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   notes NoteTag[]
+  ideas IdeaTag[]
 
   @@unique([userId, name])
   @@map("tags")
@@ -177,4 +181,67 @@ model NoteTag {
   @@id([noteId, tagId])
   @@index([tagId])
   @@map("note_tags")
+}
+
+// ---------------------------------------------------------------------------
+// Ideas: independent pieces of knowledge, which can come from several books.
+// ---------------------------------------------------------------------------
+
+model Idea {
+  id          String   @id @default(cuid())
+  userId      String
+  // The idea itself, stated as a claim ("Environment shapes behavior").
+  title       String
+  // Optional Markdown elaboration.
+  explanation String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sources IdeaSource[]
+  notes   IdeaNote[]
+  tags    IdeaTag[]
+
+  @@index([userId])
+  @@map("ideas")
+}
+
+// Which books an idea comes from. Deleting a book removes the link, not the
+// idea. Rule (enforced in lib/services/ideas.ts): the book of every
+// supporting note is also a source.
+model IdeaSource {
+  ideaId String
+  bookId String
+
+  idea Idea @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@id([ideaId, bookId])
+  @@index([bookId])
+  @@map("idea_sources")
+}
+
+// Notes that support an idea.
+model IdeaNote {
+  ideaId String
+  noteId String
+
+  idea Idea @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  note Note @relation(fields: [noteId], references: [id], onDelete: Cascade)
+
+  @@id([ideaId, noteId])
+  @@index([noteId])
+  @@map("idea_notes")
+}
+
+model IdeaTag {
+  ideaId String
+  tagId  String
+
+  idea Idea @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([ideaId, tagId])
+  @@index([tagId])
+  @@map("idea_tags")
 }

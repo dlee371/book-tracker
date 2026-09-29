@@ -9,6 +9,7 @@ import "dotenv/config";
 
 import { auth } from "@/lib/auth";
 import { authorSortKey } from "@/lib/author-sort";
+import { createIdea } from "@/lib/services/ideas";
 import { db } from "@/lib/db";
 import type { Prisma } from "@/lib/generated/prisma/client";
 
@@ -180,6 +181,26 @@ async function main() {
       },
     });
   }
+
+  // Ideas go through the real service, so they follow the same rules as the
+  // app (e.g. supporting notes' books become sources).
+  const noteId = async (body: string) =>
+    (await db.note.findFirstOrThrow({ where: { userId: user.id, body: { startsWith: body } } })).id;
+
+  await createIdea(user.id, {
+    title: "Environment shapes behavior more than willpower does",
+    explanation: "Rather than relying on motivation, change the surroundings so the desired behavior is the easy default.",
+    tags: ["environment", "behavior"],
+    bookIds: [],
+    noteIds: [await noteId("Small environmental changes")],
+  });
+  await createIdea(user.id, {
+    title: "Automatic thinking is efficient, and exploitable",
+    explanation: "Fast mental shortcuts serve us well most of the time, which is exactly why persuaders target them.",
+    tags: ["decision making"],
+    bookIds: [],
+    noteIds: [await noteId("System 1 is fast"), await noteId("*Click, whirr*")],
+  });
 
   console.log(`Seeded ${user.email} with sample books.`);
 }

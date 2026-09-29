@@ -18,7 +18,7 @@ export default async function TagsPage() {
         <div className="rounded-xl border border-dashed p-12 text-center">
           <p className="font-medium">No tags yet</p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Add tags to your notes to group ideas across books.
+            Add tags to notes and ideas to group them across books.
           </p>
         </div>
       ) : (
@@ -31,7 +31,7 @@ export default async function TagsPage() {
               >
                 #{tag.name}
                 <span className="text-xs tabular-nums text-muted-foreground">
-                  {tag.noteCount}
+                  {tag.noteCount + tag.ideaCount}
                 </span>
               </Link>
             </li>

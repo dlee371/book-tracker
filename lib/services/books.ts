@@ -71,6 +71,15 @@ export async function countBooksByStatus(
   return counts;
 }
 
+// Minimal list for pickers (e.g. an idea's source books), A–Z.
+export function listBookOptions(userId: string) {
+  return db.book.findMany({
+    where: { userId },
+    select: { id: true, title: true, author: true },
+    orderBy: [{ title: "asc" }, { authorSort: "asc" }],
+  });
+}
+
 // cache() dedupes calls within one request: the book page asks for the book
 // in both generateMetadata (the tab title) and the page itself.
 export const getBook = cache((userId: string, bookId: string) => {
