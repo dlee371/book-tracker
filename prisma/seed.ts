@@ -1,23 +1,29 @@
-// Fills the local database with a development user and sample books.
-// Run with `npx prisma db seed`. Safe to run repeatedly: it resets the dev
-// user's books each time.
+// Creates a development account with sample books.
+// Run with `npm run db:seed`. Safe to run repeatedly: it deletes and
+// recreates the dev account (and, via cascade, its books and sessions).
+//
+// Development-only sign-in:
+//   email:    dev@example.com
+//   password: dev-password-123
 import "dotenv/config";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../lib/generated/prisma/client";
-import { DEV_USER_EMAIL } from "../lib/dev-user";
 
-const db = new PrismaClient({
-  adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
-});
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+
+const DEV_ACCOUNT = {
+  name: "Dev Reader",
+  email: "dev@example.com",
+  password: "dev-password-123",
+};
 
 async function main() {
-  const user = await db.user.upsert({
-    where: { email: DEV_USER_EMAIL },
-    update: {},
-    create: { email: DEV_USER_EMAIL, name: "Dev Reader" },
-  });
+  await db.user.deleteMany({ where: { email: DEV_ACCOUNT.email } });
 
-  await db.book.deleteMany({ where: { userId: user.id } });
+  // Sign up through Better Auth so the password is hashed exactly as it would
+  // be for a real user.
+  const { user } = await auth.api.signUpEmail({ body: DEV_ACCOUNT });
+  // Sign-up also signs in, creating a session no browser will ever use.
+  await db.session.deleteMany({ where: { userId: user.id } });
 
   await db.book.createMany({
     data: [
@@ -66,7 +72,7 @@ async function main() {
     ],
   });
 
-  console.log(`Seeded dev user ${user.email} with 4 books.`);
+  console.log(`Seeded ${user.email} with 4 books.`);
 }
 
 main()

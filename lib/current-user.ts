@@ -1,29 +1,28 @@
 import "server-only";
 
-import { connection } from "next/server";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { cache } from "react";
 
-import { db } from "@/lib/db";
-import { DEV_USER_EMAIL } from "@/lib/dev-user";
+import { auth } from "@/lib/auth";
 
-// TEMPORARY (Milestone 1): always returns the seeded dev user.
-// Milestone 2 replaces the body with a real session lookup; callers won't
-// need to change.
-//
-// cache() dedupes calls within a single request, so several components can
-// ask for the user without repeating the query.
-export const getCurrentUserId = cache(async (): Promise<string> => {
-  // The current user is a per-request question. connection() tells Next.js
-  // not to prerender pages that call this at build time. (Reading the session
-  // cookie in Milestone 2 has the same effect.)
-  await connection();
-
-  const user = await db.user.findUnique({
-    where: { email: DEV_USER_EMAIL },
-    select: { id: true },
-  });
-  if (!user) {
-    throw new Error("Dev user not found. Run `npm run db:seed` first.");
-  }
-  return user.id;
+// Reads the session cookie from the incoming request and looks it up.
+// cache() means this runs at most once per request, however many components
+// ask. Reading headers() also tells Next.js the page is per-request.
+export const getSession = cache(async () => {
+  return auth.api.getSession({ headers: await headers() });
 });
+
+// For pages that work with or without a signed-in user (header, home page).
+export async function getCurrentUser() {
+  const session = await getSession();
+  return session?.user ?? null;
+}
+
+// For everything that requires a signed-in user: pages, server actions and
+// anything that touches user data. Sends signed-out visitors to /login.
+export async function getCurrentUserId(): Promise<string> {
+  const session = await getSession();
+  if (!session) redirect("/login");
+  return session.user.id;
+}

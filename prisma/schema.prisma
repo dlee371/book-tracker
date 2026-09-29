@@ -10,8 +10,11 @@ datasource db {
   provider = "postgresql"
 }
 
-// Field names follow what Better Auth expects, so Milestone 2 (auth) can
-// reuse this table instead of replacing it.
+// ---------------------------------------------------------------------------
+// Authentication (Better Auth). Field names must match what Better Auth
+// expects; see node_modules/@better-auth/core/dist/db/get-tables.mjs.
+// ---------------------------------------------------------------------------
+
 model User {
   id            String   @id @default(cuid())
   name          String
@@ -21,10 +24,69 @@ model User {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  books Book[]
+  sessions Session[]
+  accounts Account[]
+  books    Book[]
 
   @@map("users")
 }
+
+// One row per signed-in browser. The session cookie holds the token.
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+// A way of signing in. For email + password, providerId is "credential" and
+// `password` holds the password hash (never the password itself).
+model Account {
+  id                    String    @id @default(cuid())
+  userId                String
+  accountId             String
+  providerId            String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("accounts")
+}
+
+// Short-lived tokens (e.g. password reset). Unused for now, but required.
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verifications")
+}
+
+// ---------------------------------------------------------------------------
+// Library
+// ---------------------------------------------------------------------------
 
 enum ReadingStatus {
   WANT_TO_READ
