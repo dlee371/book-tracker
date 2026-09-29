@@ -12,12 +12,14 @@ export async function SiteHeader() {
 
   return (
     <header className="border-b">
-      <nav className="mx-auto flex h-14 w-full max-w-3xl items-center gap-4 px-4 sm:gap-6">
+      {/* Phones: logo and account actions on the first row, section links on a
+          second row. Wider screens: everything on one row. */}
+      <nav className="mx-auto flex w-full max-w-3xl flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2 sm:h-14 sm:flex-nowrap sm:gap-6 sm:py-0">
         <Link href="/" className="font-semibold tracking-tight">
           Book Tracker
         </Link>
         {user && (
-          <>
+          <div className="order-last flex w-full gap-5 sm:order-none sm:w-auto sm:gap-6">
             <Link
               href="/books"
               className="text-sm text-muted-foreground hover:text-foreground"
@@ -36,7 +38,13 @@ export async function SiteHeader() {
             >
               Tags
             </Link>
-          </>
+            <Link
+              href="/graph"
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              Graph
+            </Link>
+          </div>
         )}
         <div className="ml-auto flex items-center gap-2 sm:gap-3">
           {user ? (

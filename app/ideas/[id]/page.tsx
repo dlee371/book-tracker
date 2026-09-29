@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeftIcon, LightbulbIcon, PencilIcon, PlusIcon } from "lucide-react";
+import {
+  ArrowLeftIcon,
+  LightbulbIcon,
+  NetworkIcon,
+  PencilIcon,
+  PlusIcon,
+} from "lucide-react";
 
 import {
   deleteIdeaAction,
@@ -50,12 +56,20 @@ export default async function IdeaPage({ params }: PageProps<"/ideas/[id]">) {
             <LightbulbIcon className="mt-1.5 size-5 shrink-0 text-amber-500" />
             {idea.title}
           </h1>
-          <Link
-            href={`/ideas/${idea.id}/edit`}
-            className={buttonVariants({ variant: "outline", size: "sm" })}
-          >
-            <PencilIcon /> Edit
-          </Link>
+          <div className="flex shrink-0 gap-2">
+            <Link
+              href={`/graph?idea=${idea.id}`}
+              className={buttonVariants({ variant: "ghost", size: "sm" })}
+            >
+              <NetworkIcon /> View in graph
+            </Link>
+            <Link
+              href={`/ideas/${idea.id}/edit`}
+              className={buttonVariants({ variant: "outline", size: "sm" })}
+            >
+              <PencilIcon /> Edit
+            </Link>
+          </div>
         </div>
         <TagList names={idea.tags.map(({ tag }) => tag.name)} />
         <p className="text-xs text-muted-foreground">

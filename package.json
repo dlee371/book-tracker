@@ -21,6 +21,7 @@
     "better-auth": "1.7",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.4.0",
+    "d3-force": "^3.0.0",
     "lucide-react": "^1.48.0",
     "next": "16.3.7",
     "pg": "^8.23.0",
@@ -36,6 +37,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@tailwindcss/typography": "^0.5.20",
+    "@types/d3-force": "^3.0.10",
     "@types/node": "^20",
     "@types/pg": "^8.23.1",
     "@types/react": "^19",
