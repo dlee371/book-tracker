@@ -2,51 +2,96 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { BookIcon, PlusIcon } from "lucide-react";
 
+import {
+  LibrarySearch,
+  StatusTabs,
+} from "@/components/books/library-toolbar";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { STATUS_LABELS } from "@/lib/books";
 import { getCurrentUserId } from "@/lib/current-user";
 import { formatCalendarDate } from "@/lib/dates";
 import type { Book } from "@/lib/generated/prisma/client";
-import { listBooks } from "@/lib/services/books";
+import { isFiltered, parseLibraryQuery } from "@/lib/library-query";
+import { countBooksByStatus, listBooks } from "@/lib/services/books";
 
 export const metadata: Metadata = { title: "Library · Book Tracker" };
 
-export default async function BooksPage() {
+export default async function BooksPage({
+  searchParams,
+}: PageProps<"/books">) {
+  const query = parseLibraryQuery(await searchParams);
   const userId = await getCurrentUserId();
-  const books = await listBooks(userId);
+
+  // The two queries don't depend on each other, so run them at the same time.
+  const [books, counts] = await Promise.all([
+    listBooks(userId, query),
+    countBooksByStatus(userId, query.q),
+  ]);
+  const libraryIsEmpty =
+    !isFiltered(query) && Object.values(counts).every((n) => n === 0);
 
   return (
     <div className="grid gap-6">
       <div className="flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Library</h1>
-          <p className="text-sm text-muted-foreground">
-            {books.length} {books.length === 1 ? "book" : "books"}
-          </p>
-        </div>
+        <h1 className="text-2xl font-semibold tracking-tight">Library</h1>
         <Link href="/books/new" className={buttonVariants()}>
           <PlusIcon /> Add book
         </Link>
       </div>
 
-      {books.length === 0 ? (
-        <div className="rounded-xl border border-dashed p-12 text-center">
-          <p className="font-medium">No books yet</p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Add the book you&apos;re reading now to get started.
-          </p>
-        </div>
+      {libraryIsEmpty ? (
+        <EmptyState title="No books yet">
+          Add the book you&apos;re reading now to get started.
+        </EmptyState>
       ) : (
-        <ul className="grid gap-3">
-          {books.map((book) => (
-            <li key={book.id}>
-              <BookRow book={book} />
-            </li>
-          ))}
-        </ul>
+        <>
+          <div className="grid gap-3">
+            <LibrarySearch query={query} />
+            <StatusTabs query={query} counts={counts} />
+          </div>
+          {books.length === 0 ? (
+            <EmptyState title="No books match">
+              <Link
+                href="/books"
+                className="text-foreground underline underline-offset-4"
+              >
+                Clear filters
+              </Link>
+            </EmptyState>
+          ) : (
+            <BookList books={books} />
+          )}
+        </>
       )}
     </div>
+  );
+}
+
+function EmptyState({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-xl border border-dashed p-12 text-center">
+      <p className="font-medium">{title}</p>
+      <p className="mt-1 text-sm text-muted-foreground">{children}</p>
+    </div>
+  );
+}
+
+function BookList({ books }: { books: Book[] }) {
+  return (
+    <ul className="grid gap-3">
+      {books.map((book) => (
+        <li key={book.id}>
+          <BookRow book={book} />
+        </li>
+      ))}
+    </ul>
   );
 }
 

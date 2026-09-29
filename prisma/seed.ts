@@ -69,10 +69,53 @@ async function main() {
         status: "ABANDONED",
         startedAt: new Date("2025-11-10"),
       },
+      {
+        userId: user.id,
+        title: "Dune",
+        author: "Frank Herbert",
+        genre: "Science Fiction",
+        publicationYear: 1965,
+        pageCount: 412,
+        status: "COMPLETED",
+        startedAt: new Date("2026-03-10"),
+        finishedAt: new Date("2026-03-28"),
+        rating: 4,
+      },
+      {
+        userId: user.id,
+        title: "Man's Search for Meaning",
+        author: "Viktor E. Frankl",
+        genre: "Psychology",
+        publicationYear: 1946,
+        pageCount: 165,
+        status: "COMPLETED",
+        startedAt: new Date("2025-12-01"),
+        finishedAt: new Date("2025-12-06"),
+        rating: 5,
+      },
+      {
+        userId: user.id,
+        title: "Influence",
+        author: "Robert B. Cialdini",
+        genre: "Psychology",
+        publicationYear: 1984,
+        pageCount: 336,
+        status: "READING",
+        startedAt: new Date("2026-09-15"),
+      },
+      {
+        userId: user.id,
+        title: "The Pragmatic Programmer",
+        author: "David Thomas & Andrew Hunt",
+        genre: "Software",
+        publicationYear: 1999,
+        pageCount: 352,
+        status: "WANT_TO_READ",
+      },
     ],
   });
 
-  console.log(`Seeded ${user.email} with 4 books.`);
+  console.log(`Seeded ${user.email} with sample books.`);
 }
 
 main()
