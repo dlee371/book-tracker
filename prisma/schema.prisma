@@ -24,10 +24,10 @@ model User {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  sessions Session[]
-  accounts Account[]
-  books    Book[]
-  notes    Note[]
+  sessions  Session[]
+  accounts  Account[]
+  books     Book[]
+  notes     Note[]
   tags      Tag[]
   ideas     Idea[]
   ideaLinks IdeaLink[]
@@ -100,7 +100,7 @@ enum ReadingStatus {
 }
 
 model Book {
-  id              String        @id @default(cuid())
+  id              String                   @id @default(cuid())
   userId          String
   title           String
   author          String
@@ -112,41 +112,51 @@ model Book {
   genre           String?
   publicationYear Int?
   pageCount       Int?
-  status          ReadingStatus @default(WANT_TO_READ)
+  status          ReadingStatus            @default(WANT_TO_READ)
   // Calendar dates without a time of day, to avoid timezone shifts.
-  startedAt       DateTime?     @db.Date
-  finishedAt      DateTime?     @db.Date
+  startedAt       DateTime?                @db.Date
+  finishedAt      DateTime?                @db.Date
   rating          Int? // 1–5
   review          String?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+  // Full-text search document, computed by Postgres (GENERATED ... STORED,
+  // see the add_search migration). Declared so Prisma doesn't drop it;
+  // queried only with raw SQL in lib/services/search.ts.
+  search          Unsupported("tsvector")? @default(dbgenerated())
 
   user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   notes       Note[]
   ideaSources IdeaSource[]
 
   @@index([userId])
+  @@index([search], type: Gin)
   @@map("books")
 }
 
 // A note written while reading a specific book. The body is Markdown.
 model Note {
-  id        String   @id @default(cuid())
+  id        String                   @id @default(cuid())
   userId    String
   bookId    String
   title     String?
   body      String
   page      Int?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime                 @default(now())
+  updatedAt DateTime                 @updatedAt
+  // Full-text search document, computed by Postgres (GENERATED ... STORED,
+  // see the add_search migration). Declared so Prisma doesn't drop it;
+  // queried only with raw SQL in lib/services/search.ts.
+  search    Unsupported("tsvector")? @default(dbgenerated())
 
-  user User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   book  Book       @relation(fields: [bookId], references: [id], onDelete: Cascade)
   tags  NoteTag[]
   ideas IdeaNote[]
 
   @@index([bookId])
   @@index([userId])
+  @@index([search], type: Gin)
   @@map("notes")
 }
 
@@ -189,14 +199,18 @@ model NoteTag {
 // ---------------------------------------------------------------------------
 
 model Idea {
-  id          String   @id @default(cuid())
+  id          String                   @id @default(cuid())
   userId      String
   // The idea itself, stated as a claim ("Environment shapes behavior").
   title       String
   // Optional Markdown elaboration.
   explanation String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime                 @default(now())
+  updatedAt   DateTime                 @updatedAt
+  // Full-text search document, computed by Postgres (GENERATED ... STORED,
+  // see the add_search migration). Declared so Prisma doesn't drop it;
+  // queried only with raw SQL in lib/services/search.ts.
+  search      Unsupported("tsvector")? @default(dbgenerated())
 
   user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   sources   IdeaSource[]
@@ -207,6 +221,7 @@ model Idea {
   linksTo   IdeaLink[]   @relation("LinkTo")
 
   @@index([userId])
+  @@index([search], type: Gin)
   @@map("ideas")
 }
 
