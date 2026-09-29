@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 import { deleteBookAction, updateBookAction } from "@/app/books/actions";
 import { BookForm } from "@/components/books/book-form";
-import { DeleteBookButton } from "@/components/books/delete-book-button";
+import { ConfirmButton } from "@/components/confirm-button";
 import { toBookFormValues } from "@/lib/books";
 import { getCurrentUserId } from "@/lib/current-user";
 import { getBook } from "@/lib/services/books";
@@ -27,9 +27,15 @@ export default async function EditBookPage({
         action={updateBookAction.bind(null, book.id)}
         initialValues={toBookFormValues(book)}
         submitLabel="Save changes"
+        cancelHref={`/books/${book.id}`}
       />
       <div className="border-t pt-6">
-        <DeleteBookButton action={deleteBookAction.bind(null, book.id)} />
+        <ConfirmButton
+          action={deleteBookAction.bind(null, book.id)}
+          message="Delete this book and all its notes? This can't be undone."
+        >
+          Delete book
+        </ConfirmButton>
       </div>
     </div>
   );

@@ -57,9 +57,12 @@ of `prisma/seed.ts`. You can also create your own account at `/signup`.
 app/                  Pages and layouts (Next.js App Router)
 app/(auth)/           Login and sign-up pages and actions
 app/api/auth/         Better Auth HTTP endpoints
-app/books/            Library pages and server actions
+app/books/            Library, book detail and edit pages, and server actions
+app/books/[id]/notes/ Note actions and the edit-note page
 components/auth/      Login and sign-up forms
-components/books/     Book form and delete button
+components/books/     Book form, cover, rating stars, library toolbar
+components/notes/     Note form and note card
+components/markdown.tsx  Safe Markdown rendering (no raw HTML)
 components/ui/        shadcn/ui components
 lib/services/         Data access; every function is scoped to a userId
 lib/validation/       Zod schemas for form input

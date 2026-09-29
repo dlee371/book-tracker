@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useActionState } from "react";
 
-import type { BookFormState } from "@/app/books/actions";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,14 +12,21 @@ import {
 } from "@/components/ui/native-select";
 import { Textarea } from "@/components/ui/textarea";
 import { STATUS_LABELS, STATUS_OPTIONS, type BookFormValues } from "@/lib/books";
+import type { FormState } from "@/lib/form-state";
 
 type BookFormProps = {
-  action: (state: BookFormState, formData: FormData) => Promise<BookFormState>;
+  action: (state: FormState, formData: FormData) => Promise<FormState>;
   initialValues?: BookFormValues;
   submitLabel: string;
+  cancelHref: string;
 };
 
-export function BookForm({ action, initialValues, submitLabel }: BookFormProps) {
+export function BookForm({
+  action,
+  initialValues,
+  submitLabel,
+  cancelHref,
+}: BookFormProps) {
   // useActionState runs the server action and keeps whatever it returns
   // (errors + submitted values) as `state`. `pending` is true while it runs.
   const [state, formAction, pending] = useActionState(action, {});
@@ -132,7 +138,7 @@ export function BookForm({ action, initialValues, submitLabel }: BookFormProps) 
         <Button type="submit" disabled={pending}>
           {pending ? "Saving…" : submitLabel}
         </Button>
-        <Link href="/books" className={buttonVariants({ variant: "ghost" })}>
+        <Link href={cancelHref} className={buttonVariants({ variant: "ghost" })}>
           Cancel
         </Link>
       </div>

@@ -124,6 +124,32 @@ async function main() {
     })),
   });
 
+  const atomicHabits = await db.book.findFirstOrThrow({
+    where: { userId: user.id, title: "Atomic Habits" },
+  });
+  await db.note.createMany({
+    data: [
+      {
+        userId: user.id,
+        bookId: atomicHabits.id,
+        page: 83,
+        title: "Make it obvious",
+        body: "Small environmental changes can make desired behaviors easier.\n\n> Environment is the invisible hand that shapes human behavior.",
+      },
+      {
+        userId: user.id,
+        bookId: atomicHabits.id,
+        page: 27,
+        body: "Habits are the **compound interest** of self-improvement:\n\n- 1% better every day adds up\n- 1% worse every day adds up too",
+      },
+      {
+        userId: user.id,
+        bookId: atomicHabits.id,
+        body: "Idea to try: put the book I'm reading on my pillow each morning.",
+      },
+    ],
+  });
+
   console.log(`Seeded ${user.email} with sample books.`);
 }
 

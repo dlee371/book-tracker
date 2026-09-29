@@ -25,8 +25,10 @@ export function Markdown({
         remarkPlugins={[remarkGfm]}
         components={{
           // Open links in a new tab, without giving that page access to ours.
-          a: ({ node: _node, ...props }) => (
-            <a {...props} target="_blank" rel="noopener noreferrer" />
+          a: ({ href, title, children }) => (
+            <a href={href} title={title} target="_blank" rel="noopener noreferrer">
+              {children}
+            </a>
           ),
         }}
       >

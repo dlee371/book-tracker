@@ -1,5 +1,7 @@
 import "server-only";
 
+import { cache } from "react";
+
 import { authorSortKey } from "@/lib/author-sort";
 import { db } from "@/lib/db";
 import type { Prisma, ReadingStatus } from "@/lib/generated/prisma/client";
@@ -68,9 +70,11 @@ export async function countBooksByStatus(
   return counts;
 }
 
-export function getBook(userId: string, bookId: string) {
+// cache() dedupes calls within one request: the book page asks for the book
+// in both generateMetadata (the tab title) and the page itself.
+export const getBook = cache((userId: string, bookId: string) => {
   return db.book.findFirst({ where: { id: bookId, userId } });
-}
+});
 
 export function createBook(userId: string, input: BookInput) {
   return db.book.create({

@@ -13,7 +13,11 @@ export default async function NewBookPage() {
   return (
     <div className="grid gap-6">
       <h1 className="text-2xl font-semibold tracking-tight">Add a book</h1>
-      <BookForm action={createBookAction} submitLabel="Add book" />
+      <BookForm
+        action={createBookAction}
+        submitLabel="Add book"
+        cancelHref="/books"
+      />
     </div>
   );
 }

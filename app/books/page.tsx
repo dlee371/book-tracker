@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BookIcon, PlusIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 
+import { BookCover } from "@/components/books/book-cover";
 import {
   LibrarySearch,
   StatusTabs,
 } from "@/components/books/library-toolbar";
+import { RatingStars } from "@/components/books/rating-stars";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { STATUS_LABELS } from "@/lib/books";
@@ -98,10 +100,10 @@ function BookList({ books }: { books: Book[] }) {
 function BookRow({ book }: { book: Book }) {
   return (
     <Link
-      href={`/books/${book.id}/edit`}
+      href={`/books/${book.id}`}
       className="flex gap-4 rounded-xl border p-3 transition-colors hover:bg-muted/50"
     >
-      <Cover url={book.coverUrl} title={book.title} />
+      <BookCover url={book.coverUrl} title={book.title} />
       <div className="grid min-w-0 flex-1 content-start gap-1">
         <div className="flex flex-wrap items-center gap-2">
           <span className="truncate font-medium">{book.title}</span>
@@ -111,12 +113,7 @@ function BookRow({ book }: { book: Book }) {
         </div>
         <span className="text-sm text-muted-foreground">{book.author}</span>
         <div className="flex flex-wrap gap-x-3 text-xs text-muted-foreground">
-          {book.rating && (
-            <span aria-label={`${book.rating} out of 5 stars`}>
-              {"★".repeat(book.rating)}
-              <span className="opacity-30">{"★".repeat(5 - book.rating)}</span>
-            </span>
-          )}
+          {book.rating && <RatingStars rating={book.rating} />}
           {book.genre && <span>{book.genre}</span>}
           {book.finishedAt && (
             <span>Finished {formatCalendarDate(book.finishedAt)}</span>
@@ -124,25 +121,5 @@ function BookRow({ book }: { book: Book }) {
         </div>
       </div>
     </Link>
-  );
-}
-
-function Cover({ url, title }: { url: string | null; title: string }) {
-  if (!url) {
-    return (
-      <div className="flex h-16 w-11 shrink-0 items-center justify-center rounded bg-muted text-muted-foreground">
-        <BookIcon className="size-4" />
-      </div>
-    );
-  }
-  // A plain <img> on purpose: next/image only allows hosts listed in advance,
-  // and cover URLs can point anywhere.
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={url}
-      alt={`Cover of ${title}`}
-      className="h-16 w-11 shrink-0 rounded object-cover"
-    />
   );
 }
