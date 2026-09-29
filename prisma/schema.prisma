@@ -10,4 +10,50 @@ datasource db {
   provider = "postgresql"
 }
 
-// Models are added in Milestone 1 (Book) onwards.
+// Field names follow what Better Auth expects, so Milestone 2 (auth) can
+// reuse this table instead of replacing it.
+model User {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  emailVerified Boolean  @default(false)
+  image         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  books Book[]
+
+  @@map("users")
+}
+
+enum ReadingStatus {
+  WANT_TO_READ
+  READING
+  COMPLETED
+  ABANDONED
+}
+
+model Book {
+  id              String        @id @default(cuid())
+  userId          String
+  title           String
+  author          String
+  coverUrl        String?
+  description     String?
+  genre           String?
+  publicationYear Int?
+  pageCount       Int?
+  status          ReadingStatus @default(WANT_TO_READ)
+  // Calendar dates without a time of day, to avoid timezone shifts.
+  startedAt       DateTime?     @db.Date
+  finishedAt      DateTime?     @db.Date
+  rating          Int? // 1–5
+  review          String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("books")
+}

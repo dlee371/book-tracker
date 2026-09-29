@@ -1,21 +1,26 @@
+import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
 
+import { buttonVariants } from "@/components/ui/button";
 import { db } from "@/lib/db";
 
 // Temporary home page for Milestone 0: proves the chain
 // Next.js -> Prisma -> Postgres works. Replaced by the dashboard later.
 export default function Home() {
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center gap-4 px-6 py-24">
+    <div className="flex flex-col gap-4 py-16">
       <h1 className="text-3xl font-semibold tracking-tight">Book Tracker</h1>
       <p className="text-muted-foreground">
         Track what you read. Capture what you learn. Connect what you learn.
       </p>
+      <Link href="/books" className={buttonVariants({ className: "w-fit" })}>
+        Go to your library
+      </Link>
       <Suspense fallback={<p className="text-sm">Checking database…</p>}>
         <DatabaseStatus />
       </Suspense>
-    </main>
+    </div>
   );
 }
 

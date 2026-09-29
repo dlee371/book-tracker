@@ -25,8 +25,9 @@ cp .env.example .env   # then edit DATABASE_URL
 # 3. Install dependencies (also generates the Prisma Client)
 npm install
 
-# 4. Apply database migrations
+# 4. Apply database migrations and load sample data
 npm run db:migrate
+npm run db:seed
 
 # 5. Start the dev server at http://localhost:3000
 npm run dev
@@ -41,6 +42,7 @@ npm run dev
 | `npm run lint` | Run ESLint |
 | `npm run typecheck` | Check TypeScript types |
 | `npm run db:migrate` | Create/apply migrations after editing `prisma/schema.prisma` |
+| `npm run db:seed` | Reset the dev user's sample books |
 | `npm run db:generate` | Regenerate the Prisma Client |
 | `npm run db:studio` | Browse the database in a web UI |
 
@@ -48,7 +50,11 @@ npm run dev
 
 ```
 app/                  Pages and layouts (Next.js App Router)
+app/books/            Library pages and server actions
+components/books/     Book form and delete button
 components/ui/        shadcn/ui components
+lib/services/         Data access; every function is scoped to a userId
+lib/validation/       Zod schemas for form input
 lib/db.ts             Shared Prisma Client (server-only)
 lib/generated/        Generated Prisma Client (not committed)
 prisma/schema.prisma  Database schema
