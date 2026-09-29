@@ -28,6 +28,7 @@ model User {
   accounts Account[]
   books    Book[]
   notes    Note[]
+  tags     Tag[]
 
   @@map("users")
 }
@@ -136,10 +137,44 @@ model Note {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  user User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  tags NoteTag[]
 
   @@index([bookId])
   @@index([userId])
   @@map("notes")
+}
+
+// ---------------------------------------------------------------------------
+// Tags
+// ---------------------------------------------------------------------------
+
+// Names are stored normalized (lowercase, trimmed; see lib/tags.ts), and each
+// user has at most one tag per name.
+model Tag {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  createdAt DateTime @default(now())
+
+  user  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notes NoteTag[]
+
+  @@unique([userId, name])
+  @@map("tags")
+}
+
+// Join table: which tags are on which notes (many-to-many). The pair of ids
+// is the primary key, so a note can't have the same tag twice.
+model NoteTag {
+  noteId String
+  tagId  String
+
+  note Note @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([noteId, tagId])
+  @@index([tagId])
+  @@map("note_tags")
 }

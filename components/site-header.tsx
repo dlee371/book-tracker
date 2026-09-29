@@ -14,12 +14,20 @@ export async function SiteHeader() {
           Book Tracker
         </Link>
         {user && (
-          <Link
-            href="/books"
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            Library
-          </Link>
+          <>
+            <Link
+              href="/books"
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              Library
+            </Link>
+            <Link
+              href="/tags"
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              Tags
+            </Link>
+          </>
         )}
         <div className="ml-auto flex items-center gap-3">
           {user ? (

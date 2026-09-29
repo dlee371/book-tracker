@@ -29,6 +29,7 @@ export default async function EditNotePage({
           title: note.title ?? "",
           page: note.page?.toString() ?? "",
           body: note.body,
+          tags: note.tags.map(({ tag }) => tag.name).join(", "),
         }}
         submitLabel="Save note"
         cancelHref={backHref}

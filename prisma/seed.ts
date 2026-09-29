@@ -124,31 +124,62 @@ async function main() {
     })),
   });
 
-  const atomicHabits = await db.book.findFirstOrThrow({
-    where: { userId: user.id, title: "Atomic Habits" },
-  });
-  await db.note.createMany({
-    data: [
-      {
+  const bookId = async (title: string) =>
+    (await db.book.findFirstOrThrow({ where: { userId: user.id, title } })).id;
+
+  const notes = [
+    {
+      bookId: await bookId("Atomic Habits"),
+      page: 83,
+      title: "Make it obvious",
+      body: "Small environmental changes can make desired behaviors easier.\n\n> Environment is the invisible hand that shapes human behavior.",
+      tags: ["environment", "behavior", "habits"],
+    },
+    {
+      bookId: await bookId("Atomic Habits"),
+      page: 27,
+      body: "Habits are the **compound interest** of self-improvement:\n\n- 1% better every day adds up\n- 1% worse every day adds up too",
+      tags: ["habits"],
+    },
+    {
+      bookId: await bookId("Atomic Habits"),
+      body: "Idea to try: put the book I'm reading on my pillow each morning.",
+      tags: [],
+    },
+    {
+      bookId: await bookId("Thinking, Fast and Slow"),
+      page: 20,
+      title: "Two systems",
+      body: "System 1 is fast and automatic; System 2 is slow and effortful. Most of our choices are made by System 1.",
+      tags: ["decision making", "behavior"],
+    },
+    {
+      bookId: await bookId("Influence"),
+      page: 12,
+      body: "*Click, whirr*: shortcuts that usually serve us well can be exploited.",
+      tags: ["decision making", "persuasion"],
+    },
+  ];
+
+  for (const { tags, ...note } of notes) {
+    await db.note.create({
+      data: {
+        ...note,
         userId: user.id,
-        bookId: atomicHabits.id,
-        page: 83,
-        title: "Make it obvious",
-        body: "Small environmental changes can make desired behaviors easier.\n\n> Environment is the invisible hand that shapes human behavior.",
+        // Use each tag if it exists, otherwise create it.
+        tags: {
+          create: tags.map((name) => ({
+            tag: {
+              connectOrCreate: {
+                where: { userId_name: { userId: user.id, name } },
+                create: { userId: user.id, name },
+              },
+            },
+          })),
+        },
       },
-      {
-        userId: user.id,
-        bookId: atomicHabits.id,
-        page: 27,
-        body: "Habits are the **compound interest** of self-improvement:\n\n- 1% better every day adds up\n- 1% worse every day adds up too",
-      },
-      {
-        userId: user.id,
-        bookId: atomicHabits.id,
-        body: "Idea to try: put the book I'm reading on my pillow each morning.",
-      },
-    ],
-  });
+    });
+  }
 
   console.log(`Seeded ${user.email} with sample books.`);
 }

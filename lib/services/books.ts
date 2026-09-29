@@ -6,6 +6,7 @@ import { authorSortKey } from "@/lib/author-sort";
 import { db } from "@/lib/db";
 import type { Prisma, ReadingStatus } from "@/lib/generated/prisma/client";
 import type { LibraryQuery, LibrarySort } from "@/lib/library-query";
+import { deleteUnusedTags } from "@/lib/services/tags";
 import type { BookInput } from "@/lib/validation/book";
 
 // All book data access goes through these functions. Every query includes
@@ -96,12 +97,17 @@ export async function updateBook(
   return count > 0;
 }
 
+// Deleting a book also deletes its notes (database cascade), which can leave
+// tags unused, so clean those up in the same transaction.
 export async function deleteBook(
   userId: string,
   bookId: string,
 ): Promise<boolean> {
-  const { count } = await db.book.deleteMany({
-    where: { id: bookId, userId },
+  return db.$transaction(async (tx) => {
+    const { count } = await tx.book.deleteMany({
+      where: { id: bookId, userId },
+    });
+    await deleteUnusedTags(tx, userId);
+    return count > 0;
   });
-  return count > 0;
 }

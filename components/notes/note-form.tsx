@@ -76,6 +76,22 @@ export function NoteForm({
         )}
       </div>
 
+      <div className="grid gap-1.5">
+        <Label htmlFor="note-tags">Tags</Label>
+        <Input
+          id="note-tags"
+          name="tags"
+          defaultValue={values.tags}
+          placeholder="habits, environment"
+          aria-invalid={errors.tags ? true : undefined}
+        />
+        {errors.tags ? (
+          <p className="text-sm text-destructive">{errors.tags[0]}</p>
+        ) : (
+          <p className="text-xs text-muted-foreground">Separate with commas</p>
+        )}
+      </div>
+
       <div className="flex gap-2">
         <Button type="submit" disabled={pending}>
           {pending ? "Saving…" : submitLabel}

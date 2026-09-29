@@ -59,9 +59,11 @@ app/(auth)/           Login and sign-up pages and actions
 app/api/auth/         Better Auth HTTP endpoints
 app/books/            Library, book detail and edit pages, and server actions
 app/books/[id]/notes/ Note actions and the edit-note page
+app/tags/             Tag index and per-tag note pages
 components/auth/      Login and sign-up forms
 components/books/     Book form, cover, rating stars, library toolbar
 components/notes/     Note form and note card
+components/tags/      Tag links
 components/markdown.tsx  Safe Markdown rendering (no raw HTML)
 components/ui/        shadcn/ui components
 lib/services/         Data access; every function is scoped to a userId

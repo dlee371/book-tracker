@@ -31,7 +31,7 @@ export async function createNoteAction(
   }
 
   // Stay on the book page. Returning an empty state clears the form.
-  revalidatePath(`/books/${bookId}`);
+  revalidateNotePages(bookId);
   return {};
 }
 
@@ -54,7 +54,7 @@ export async function updateNoteAction(
     return { message: "This note no longer exists.", values };
   }
 
-  revalidatePath(`/books/${bookId}`);
+  revalidateNotePages(bookId);
   redirect(`/books/${bookId}#note-${noteId}`);
 }
 
@@ -64,5 +64,11 @@ export async function deleteNoteAction(
 ): Promise<void> {
   const userId = await getCurrentUserId();
   await deleteNote(userId, noteId);
+  revalidateNotePages(bookId);
+}
+
+// Notes appear on their book's page and on tag pages.
+function revalidateNotePages(bookId: string) {
   revalidatePath(`/books/${bookId}`);
+  revalidatePath("/tags", "layout");
 }
