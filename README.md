@@ -59,7 +59,7 @@ app/(auth)/           Login and sign-up pages and actions
 app/api/auth/         Better Auth HTTP endpoints
 app/books/            Library, book detail and edit pages, and server actions
 app/books/[id]/notes/ Note actions and the edit-note page
-app/ideas/            Idea list, detail, new/edit pages and actions
+app/ideas/            Idea list, detail, new/edit/connect pages and actions
 app/tags/             Tag index and per-tag pages (ideas and notes)
 components/auth/      Login and sign-up forms
 components/books/     Book form, cover, rating stars, library toolbar
@@ -69,6 +69,7 @@ components/tags/      Tag links
 components/markdown.tsx  Safe Markdown rendering (no raw HTML)
 components/ui/        shadcn/ui components
 lib/services/         Data access; every function is scoped to a userId
+lib/idea-links.ts     How idea connections are phrased and grouped
 lib/validation/       Zod schemas for form input
 lib/auth.ts           Better Auth configuration
 lib/current-user.ts   Session helpers (getCurrentUserId redirects to /login)

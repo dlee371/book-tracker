@@ -14,7 +14,9 @@ import {
   unlinkNoteFromIdea,
   updateIdea,
 } from "@/lib/services/ideas";
+import { connectIdeas, deleteIdeaLink } from "@/lib/services/idea-links";
 import { ideaSchema } from "@/lib/validation/idea";
+import { connectSchema } from "@/lib/validation/idea-link";
 
 // Ideas appear on idea pages, book pages (ideas from this book, and on note
 // cards) and tag pages, so refresh everything after a change.
@@ -108,5 +110,31 @@ export async function unlinkNoteFromIdeaAction(
 ): Promise<void> {
   const userId = await getCurrentUserId();
   await unlinkNoteFromIdea(userId, ideaId, noteId);
+  revalidateAll();
+}
+
+export async function connectIdeasAction(
+  ideaId: string,
+  _prevState: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const userId = await getCurrentUserId();
+  const values = formValues(formData);
+
+  const parsed = connectSchema.safeParse(values);
+  if (!parsed.success) {
+    return { fieldErrors: z.flattenError(parsed.error).fieldErrors, values };
+  }
+
+  const result = await connectIdeas(userId, ideaId, parsed.data);
+  if (!result.ok) return { message: result.error, values };
+
+  revalidateAll();
+  redirect(`/ideas/${ideaId}#connections`);
+}
+
+export async function deleteIdeaLinkAction(linkId: string): Promise<void> {
+  const userId = await getCurrentUserId();
+  await deleteIdeaLink(userId, linkId);
   revalidateAll();
 }

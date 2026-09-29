@@ -9,6 +9,7 @@ import "dotenv/config";
 
 import { auth } from "@/lib/auth";
 import { authorSortKey } from "@/lib/author-sort";
+import { connectIdeas } from "@/lib/services/idea-links";
 import { createIdea } from "@/lib/services/ideas";
 import { db } from "@/lib/db";
 import type { Prisma } from "@/lib/generated/prisma/client";
@@ -187,19 +188,39 @@ async function main() {
   const noteId = async (body: string) =>
     (await db.note.findFirstOrThrow({ where: { userId: user.id, body: { startsWith: body } } })).id;
 
-  await createIdea(user.id, {
+  const environment = await createIdea(user.id, {
     title: "Environment shapes behavior more than willpower does",
     explanation: "Rather than relying on motivation, change the surroundings so the desired behavior is the easy default.",
     tags: ["environment", "behavior"],
     bookIds: [],
     noteIds: [await noteId("Small environmental changes")],
   });
-  await createIdea(user.id, {
+  const automatic = await createIdea(user.id, {
     title: "Automatic thinking is efficient, and exploitable",
     explanation: "Fast mental shortcuts serve us well most of the time, which is exactly why persuaders target them.",
     tags: ["decision making"],
     bookIds: [],
     noteIds: [await noteId("System 1 is fast"), await noteId("*Click, whirr*")],
+  });
+
+  // A standalone idea (no book), to show that ideas can stand on their own.
+  const willpower = await createIdea(user.id, {
+    title: "Lasting change comes down to willpower and discipline",
+    explanation: null,
+    tags: ["habits"],
+    bookIds: [],
+    noteIds: [],
+  });
+
+  await connectIdeas(user.id, automatic.id, {
+    relation: "SUPPORTS",
+    targetIdeaId: environment.id,
+    comment: "Cues in the environment trigger fast, automatic responses.",
+  });
+  await connectIdeas(user.id, environment.id, {
+    relation: "CONTRADICTS",
+    targetIdeaId: willpower.id,
+    comment: null,
   });
 
   console.log(`Seeded ${user.email} with sample books.`);

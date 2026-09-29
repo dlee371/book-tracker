@@ -28,8 +28,9 @@ model User {
   accounts Account[]
   books    Book[]
   notes    Note[]
-  tags     Tag[]
-  ideas    Idea[]
+  tags      Tag[]
+  ideas     Idea[]
+  ideaLinks IdeaLink[]
 
   @@map("users")
 }
@@ -197,10 +198,13 @@ model Idea {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sources IdeaSource[]
-  notes   IdeaNote[]
-  tags    IdeaTag[]
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sources   IdeaSource[]
+  notes     IdeaNote[]
+  tags      IdeaTag[]
+  // Connections to other ideas, split by which end this idea is on.
+  linksFrom IdeaLink[]   @relation("LinkFrom")
+  linksTo   IdeaLink[]   @relation("LinkTo")
 
   @@index([userId])
   @@map("ideas")
@@ -244,4 +248,39 @@ model IdeaTag {
   @@id([ideaId, tagId])
   @@index([tagId])
   @@map("idea_tags")
+}
+
+// ---------------------------------------------------------------------------
+// Connections between ideas
+// ---------------------------------------------------------------------------
+
+enum IdeaLinkType {
+  SUPPORTS // from supports to (directional)
+  EXTENDS // from builds on to (directional)
+  CONTRADICTS // symmetric
+  RELATED // symmetric
+}
+
+// A typed connection between two of the user's ideas.
+// - Symmetric types are stored with the smaller id as fromIdeaId, so the
+//   unique constraint also blocks "B-A" when "A-B" exists
+//   (see lib/services/idea-links.ts).
+// - The migration adds a CHECK constraint so an idea can't link to itself.
+model IdeaLink {
+  id         String       @id @default(cuid())
+  userId     String
+  fromIdeaId String
+  toIdeaId   String
+  type       IdeaLinkType
+  comment    String?
+  createdAt  DateTime     @default(now())
+
+  user     User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fromIdea Idea @relation("LinkFrom", fields: [fromIdeaId], references: [id], onDelete: Cascade)
+  toIdea   Idea @relation("LinkTo", fields: [toIdeaId], references: [id], onDelete: Cascade)
+
+  @@unique([fromIdeaId, toIdeaId, type])
+  @@index([toIdeaId])
+  @@index([userId])
+  @@map("idea_links")
 }
