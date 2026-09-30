@@ -16,6 +16,11 @@ export default defineConfig({
     environment: "node",
     include: ["tests/**/*.test.ts"],
     globalSetup: ["tests/support/global-setup.ts"],
-    env: { DATABASE_URL: TEST_DATABASE_URL },
+    env: {
+      DATABASE_URL: TEST_DATABASE_URL,
+      // Test-only values; real ones live in .env and the host's settings.
+      BETTER_AUTH_SECRET: "test-secret-for-vitest-only-not-used-anywhere-else",
+      BETTER_AUTH_URL: "http://localhost:3000",
+    },
   },
 });

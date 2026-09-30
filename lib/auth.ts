@@ -14,6 +14,10 @@ export const auth = betterAuth({
     enabled: true,
     minPasswordLength: 8,
   },
+  // Our forms sign in and up through server actions (which apply our own
+  // rate limits), never through these HTTP endpoints, so switch them off.
+  // This only affects /api/auth/* requests; auth.api calls still work.
+  disabledPaths: ["/sign-in/email", "/sign-up/email"],
   // Lets server actions set the session cookie. Must be the last plugin.
   plugins: [nextCookies()],
 });

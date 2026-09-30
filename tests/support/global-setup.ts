@@ -24,6 +24,9 @@ export default async function setup() {
     // Identifiers can't be query parameters; the name was checked above.
     await client.query(`CREATE DATABASE "${name}"`);
   }
+  // Sessions must run in UTC, matching production and how Prisma writes
+  // timestamps (see README, "Local setup").
+  await client.query(`ALTER DATABASE "${name}" SET timezone TO 'UTC'`);
   await client.end();
 
   execSync("npx prisma migrate deploy", {

@@ -19,6 +19,9 @@ Prerequisites: Node.js 24 (see `.node-version`) and PostgreSQL 18.
 # 1. Start Postgres and create the database (Homebrew on macOS)
 brew services start postgresql@18
 createdb book_tracker
+# Run database sessions in UTC, like hosted Postgres (Neon) does. Prisma
+# writes timestamps as UTC; a local time zone here causes subtle bugs.
+psql -d postgres -c "ALTER DATABASE book_tracker SET timezone TO 'UTC'"
 
 # 2. Configure environment variables
 cp .env.example .env   # then set DATABASE_URL and BETTER_AUTH_SECRET

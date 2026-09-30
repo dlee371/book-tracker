@@ -299,3 +299,19 @@ model IdeaLink {
   @@index([userId])
   @@map("idea_links")
 }
+
+// ---------------------------------------------------------------------------
+// Rate limiting (sign-in / sign-up attempts). In Postgres so every server
+// instance shares the same counts. See lib/services/rate-limit.ts.
+// ---------------------------------------------------------------------------
+
+model RateLimit {
+  key         String   @id // e.g. "sign-in:email:alice@example.com"
+  count       Int
+  // timestamptz, not Prisma's default timestamp: the raw SQL compares it with
+  // now(), and only timestamptz means the same instant whatever the database
+  // session's time zone is.
+  windowStart DateTime @db.Timestamptz(3)
+
+  @@map("rate_limits")
+}
