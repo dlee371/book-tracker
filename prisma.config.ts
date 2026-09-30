@@ -10,7 +10,9 @@ export default defineConfig({
     seed: "tsx --conditions=react-server prisma/seed.ts",
   },
   datasource: {
-    // env() throws a clear error if DATABASE_URL is missing.
-    url: env("DATABASE_URL"),
+    // Hosted Postgres (Neon) offers a pooled URL for the app and a direct one
+    // for migrations, which need a dedicated connection. Prefer the direct
+    // one when it's set; env() throws a clear error if neither exists.
+    url: process.env.DATABASE_URL_UNPOOLED ?? env("DATABASE_URL"),
   },
 });

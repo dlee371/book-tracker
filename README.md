@@ -47,6 +47,7 @@ of `prisma/seed.ts`. You can also create your own account at `/signup`.
 |---|---|
 | `npm run dev` | Start the development server |
 | `npm run build` | Production build |
+| `npm run vercel-build` | What Vercel runs on deploy: apply migrations, then build |
 | `npm run lint` | Run ESLint |
 | `npm run typecheck` | Check TypeScript types |
 | `npm test` | Run the test suite (`npm run test:watch` to re-run on save) |
