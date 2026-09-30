@@ -12,17 +12,6 @@ export function formatCalendarDate(date: Date): string {
   });
 }
 
-// For real timestamps (e.g. when a note was written), shown as a date.
-// Known limitation: this runs on the server, so it uses the server's time
-// zone, not the reader's. Fine locally; revisit before deploying.
-export function formatTimestampDate(date: Date): string {
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
-
 // Value for <input type="date">, which expects "YYYY-MM-DD".
 export function toDateInputValue(date: Date | null): string {
   return date ? date.toISOString().slice(0, 10) : "";

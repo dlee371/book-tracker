@@ -16,11 +16,11 @@ import {
 } from "@/app/ideas/actions";
 import { BookCover } from "@/components/books/book-cover";
 import { ConfirmButton } from "@/components/confirm-button";
+import { LocalDate } from "@/components/local-date";
 import { Markdown } from "@/components/markdown";
 import { TagList } from "@/components/tags/tag-list";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { getCurrentUserId } from "@/lib/current-user";
-import { formatTimestampDate } from "@/lib/dates";
 import { CONNECTION_GROUPS, connectionGroup } from "@/lib/idea-links";
 import { listConnections, type Connection } from "@/lib/services/idea-links";
 import { getIdea } from "@/lib/services/ideas";
@@ -73,7 +73,7 @@ export default async function IdeaPage({ params }: PageProps<"/ideas/[id]">) {
         </div>
         <TagList names={idea.tags.map(({ tag }) => tag.name)} />
         <p className="text-xs text-muted-foreground">
-          Captured {formatTimestampDate(idea.createdAt)}
+          Captured <LocalDate date={idea.createdAt} />
         </p>
       </header>
 

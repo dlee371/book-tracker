@@ -3,10 +3,10 @@ import { LightbulbIcon } from "lucide-react";
 
 import { deleteNoteAction } from "@/app/books/[id]/notes/actions";
 import { ConfirmButton } from "@/components/confirm-button";
+import { LocalDate } from "@/components/local-date";
 import { Markdown } from "@/components/markdown";
 import { TagList } from "@/components/tags/tag-list";
 import { buttonVariants } from "@/components/ui/button";
-import { formatTimestampDate } from "@/lib/dates";
 import type { NoteWithDetails } from "@/lib/services/notes";
 
 export function NoteCard({
@@ -36,7 +36,7 @@ export function NoteCard({
           </span>
         )}
         <span className="text-xs text-muted-foreground">
-          {formatTimestampDate(note.createdAt)}
+          <LocalDate date={note.createdAt} />
         </span>
       </header>
 

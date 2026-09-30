@@ -1,6 +1,6 @@
 import Form from "next/form";
 import Link from "next/link";
-import { SearchIcon } from "lucide-react";
+import { SearchIcon, UserIcon } from "lucide-react";
 
 import { signOutAction } from "@/app/(auth)/actions";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -71,9 +71,14 @@ export async function SiteHeader() {
                   className="h-8 w-44"
                 />
               </Form>
-              <span className="hidden text-sm text-muted-foreground sm:inline">
-                {user.name}
-              </span>
+              <Link
+                href="/account"
+                aria-label="Account"
+                className="text-sm text-muted-foreground hover:text-foreground"
+              >
+                <UserIcon className="size-4 sm:hidden" />
+                <span className="hidden sm:inline">{user.name}</span>
+              </Link>
               <form action={signOutAction}>
                 <Button type="submit" variant="ghost" size="sm">
                   Sign out
