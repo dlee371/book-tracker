@@ -46,10 +46,25 @@ of `prisma/seed.ts`. You can also create your own account at `/signup`.
 | `npm run build` | Production build |
 | `npm run lint` | Run ESLint |
 | `npm run typecheck` | Check TypeScript types |
+| `npm test` | Run the test suite (`npm run test:watch` to re-run on save) |
 | `npm run db:migrate` | Create/apply migrations after editing `prisma/schema.prisma` |
 | `npm run db:seed` | Recreate the dev account and its sample books |
 | `npm run db:generate` | Regenerate the Prisma Client |
 | `npm run db:studio` | Browse the database in a web UI |
+
+## Testing
+
+`npm test` runs two kinds of tests with [Vitest](https://vitest.dev):
+
+- `tests/unit/`: pure functions (parsing, validation, sort keys). No database.
+- `tests/integration/`: services against a real Postgres database, covering
+  ownership (users can't touch each other's data), transactions rolling
+  back, tag cleanup and database constraints.
+
+Integration tests use a separate database, `book_tracker_test`, created and
+migrated automatically on first run. Set `TEST_DATABASE_URL` to use a
+different one; its name must end in `_test`. Each test file creates its own
+users and deletes them afterwards.
 
 ## Project structure
 
@@ -82,4 +97,5 @@ lib/db.ts             Shared Prisma Client (server-only)
 lib/generated/        Generated Prisma Client (not committed)
 prisma/schema.prisma  Database schema
 prisma.config.ts      Prisma CLI configuration
+tests/                Unit and integration tests
 ```

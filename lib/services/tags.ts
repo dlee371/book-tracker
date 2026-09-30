@@ -2,19 +2,23 @@ import "server-only";
 
 import { db } from "@/lib/db";
 import type { Prisma } from "@/lib/generated/prisma/client";
+import { normalizeTagName } from "@/lib/tags";
 
 // These helpers take a transaction client (`tx`) so callers can run them
 // together with their own writes: all succeed, or none do.
 
-// Ids of the user's tags with these (already normalized) names, creating any
+// Ids of the user's tags with these names (normalized here), creating any
 // that don't exist yet. Two queries however many names there are:
 // skipDuplicates becomes "ON CONFLICT DO NOTHING", so existing names (or ones
 // created by a simultaneous request) don't cause an error.
 async function getOrCreateTagIds(
   tx: Prisma.TransactionClient,
   userId: string,
-  names: string[],
+  rawNames: string[],
 ): Promise<string[]> {
+  // Normalize here, not only in form validation, so no caller (imports,
+  // future AI suggestions) can create "Focus" next to "focus".
+  const names = [...new Set(rawNames.map(normalizeTagName).filter(Boolean))];
   if (names.length === 0) return [];
   await tx.tag.createMany({
     data: names.map((name) => ({ userId, name })),
